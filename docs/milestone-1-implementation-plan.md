@@ -60,6 +60,274 @@ Feature Flags: Config in DynamoDB + edge-cached
 
 **Why this stack?** Minimal ops, easy scaling, quick iteration, aligns with AWS infra and TypeScript preference. Optionally swap backend to Kotlin/Spring on ECS if desired later.
 
+Here’s a sketched architecture diagram for the MVP based on the plan:
+
+```
+                  ┌──────────────────────────┐
+                  │  Web App (Next.js/Remix) │
+                  │  UI (React) + Auth       │
+                  │  Editor + Feed           │
+                  └─────────────┬────────────┘
+                                │ API Routes (/api/*)
+                                ▼
+                      ┌──────────────────────┐
+                      │ Backend (Lambdas)    │
+                      ├──────────────────────┤
+                      │ Feed Service         │
+                      │  - Trigger SQS       │
+                      │  - Fetcher Workers   │
+                      │    * RSS/Atom        │
+                      │    * News APIs       │
+                      │    * HTML Parser     │
+                      │ Dedupe & Classifier  │
+                      │ Summariser (LLM)     │
+                      │ Draft Service        │
+                      │ Publisher Adapters   │
+                      │ Scheduler            │
+                      │ Analytics Collector  │
+                      └─────────────┬────────┘
+                                    │
+          ┌─────────────────────────┼─────────────────────────┐
+          ▼                         ▼                         ▼
+ ┌────────────────┐        ┌─────────────────┐       ┌─────────────────────┐
+ │ DynamoDB       │        │ OpenSearch      │       │ S3 (Cache/Exports)  │
+ │ - Users        │        │ - Search Index  │       │ - Raw Metadata      │
+ │ - Preferences  │        │ - Ranking       │       │ - Assets            │
+ │ - Items        │        └─────────────────┘       └─────────────────────┘
+ │ - Drafts       │
+ │ - QnA          │
+ │ - Roundups     │
+ │ - Tokens       │
+ │ - Events       │
+ └────────────────┘
+          │
+          ▼
+ ┌───────────────────┐
+ │ External Services │
+ │ - LinkedIn API    │
+ │ - Substack API    │
+ │ - News APIs       │
+ └───────────────────┘
+```
+
+This diagram shows:
+
+- **Top layer:** Web app and user-facing UI
+- **Middle layer:** API routes backed by AWS Lambdas handling business logic
+- **Data layer:** DynamoDB, OpenSearch, S3 for persistence, search, and caching
+- **External integrations:** Publishing platforms and news sources
+
+
+
+---
+
+## 2a) Architecture Diagrams (Mermaid)
+
+> High-level system context, ingestion flow, and an end-to-end “Elaborate → Draft → Publish” sequence. Copy these into the repo README for quick onboarding.
+
+### A) System Context
+
+```
+flowchart LR
+  subgraph Client
+    U[User (Browser)
+Next.js/React]
+  end
+
+  subgraph Edge
+    CF[CloudFront]
+    S3S[Static S3]
+  end
+
+  subgraph App[Web App]
+    API[/Next.js API Routes/]
+    Auth[Cognito/Auth0]
+  end
+
+  subgraph Services[AWS Services]
+    Feed[Feed Service
+(Lambda)]
+    Q[\"ingest\" Queue
+(SQS)]
+    F1[Fetcher Workers
+(Lambda)]
+    Dedupe[Dedupe/Classifier
+(Lambda)]
+    Summ[Summariser w/ Citations
+(Lambda)]
+    DraftsSvc[Draft Service
+(Lambda)]
+    Pub[Publisher Adapters
+(Lambda)]
+    Sched[Scheduler
+(EventBridge)]
+    Round[Roundup Generator
+(Lambda)]
+    Anal[Analytics Collector]
+  end
+
+  subgraph Data[Data Stores]
+    DDBI[(DynamoDB: Items)]
+    DDBU[(DynamoDB: UserItemState)]
+    DDBE[(DynamoDB: Elaborations)]
+    DDBD[(DynamoDB: Drafts/QnA/Templates)]
+    DDBR[(DynamoDB: Roundups)]
+    Flags[(DynamoDB: FeatureFlags)]
+    OS[(OpenSearch: items_idx)]
+    S3Raw[(S3: Raw Cache)]
+    S3A[(S3: Analytics)]
+    Secrets[Secrets Manager: Tokens]
+  end
+
+  subgraph External[3rd Parties]
+    RSS[(RSS/Atom Feeds)]
+    News[(News APIs)]
+    HTMLP[HTML Metadata]
+    LLM[(LLM Provider)]
+    LI[[LinkedIn API]]
+    SS[[Substack API]]
+    BI[(QuickSight/PostHog)]
+  end
+
+  U -->|HTTPS| CF
+  CF --> S3S
+  U -->|HTTPS| API
+  API --> Auth
+
+  API --> Feed
+  Feed --> Q
+  Q --> F1
+  F1 --> RSS
+  F1 --> News
+  F1 --> HTMLP
+  F1 --> S3Raw
+  F1 --> Dedupe
+  Dedupe --> OS
+  Dedupe --> DDBI
+
+  API --> Summ
+  Summ --> LLM
+  Summ --> DDBE
+
+  API --> DraftsSvc
+  DraftsSvc --> DDBD
+
+  API --> Pub
+  Pub --> Secrets
+  Pub --> LI
+  Pub --> SS
+
+  API --> Sched
+  Sched --> Round
+  Round --> DDBR
+
+  API --> Anal
+  Anal --> S3A
+  S3A --> BI
+
+  %% Observability
+  classDef obs fill:#eef,stroke:#99f,stroke-width:1px;
+```
+
+### B) Ingestion & Ranking Flow
+
+```
+flowchart TB
+  EV[EventBridge Timer
+(15–60 min)] --> FBatch[Feed Batch Orchestrator
+(Lambda)]
+  FBatch --> Add[Resolve Sources
+(seed + user-added RSS)]
+  Add --> Fan[SQS Fan-out]
+  Fan --> W1[Fetcher Worker
+(Lambda)]
+  Fan --> W2[Fetcher Worker
+(Lambda)]
+  W1 --> Meta[Extract metadata + canonical URL]
+  W2 --> Meta
+  Meta --> Cache[S3 Raw Cache]
+  Meta --> Hash[SimHash/Jaro–Winkler]
+style Hash stroke-dasharray: 3 3
+  Hash --> Cluster[Cluster/Choose Canonical]
+  Cluster --> Index[OpenSearch Index]
+  Cluster --> Store[(DynamoDB Items)]
+  Index --> Rank[Ranking]
+  Store --> Rank
+  Rank --> FeedAPI[/GET /api/feed
+(topic, source, cursor)/]
+```
+
+### C) Elaborate → Draft → Publish (Sequence)
+
+```
+sequenceDiagram
+  autonumber
+  participant User
+  participant Web as Web App (Next.js)
+  participant API as API Routes
+  participant Summ as Summariser (Lambda)
+  participant LLM as LLM Provider
+  participant Draft as Draft Service (Lambda)
+  participant DDB as DynamoDB
+  participant Pub as Publisher (Lambda)
+  participant LI as LinkedIn
+  participant SS as Substack
+
+  User->>Web: Click "Elaborate"
+  Web->>API: POST /item/{id}/elaborate
+  API->>Summ: Invoke with item metadata
+  Summ->>LLM: Prompt (citations required)
+  LLM-->>Summ: JSON (summary, takeaways, why, citations)
+  Summ->>DDB: Save elaboration
+  Summ-->>API: Payload + latency
+  API-->>Web: Render panel (citations)
+
+  User->>Web: Answer Q&A, choose LinkedIn
+  Web->>API: POST /drafts/generate {itemId, qa, style}
+  API->>Draft: Invoke with inputs
+  Draft->>DDB: Read item + Q&A + elaboration
+  Draft->>LLM: Draft prompt
+  LLM-->>Draft: body + titles + hashtags
+  Draft->>DDB: Save draft (v1)
+  Draft-->>API: draftId
+  API-->>Web: Load editor (v1)
+  User->>Web: Publish
+  alt LinkedIn
+    Web->>API: POST /drafts/{id}/publish (linkedin)
+    API->>Pub: Invoke (linkedin)
+    Pub->>DDB: Read token (Secrets)
+    Pub->>LI: Create UGC Post
+    LI-->>Pub: URL
+  else Substack
+    Web->>API: POST /drafts/{id}/publish (substack)
+    API->>Pub: Invoke (substack)
+    Pub->>DDB: Read token (Secrets)
+    Pub->>SS: Create Draft/Publish
+    SS-->>Pub: URL
+  end
+  Pub->>DDB: Update draft status
+  Pub-->>API: {url}
+  API-->>Web: Success + link
+```
+
+### D) Reliability & Scheduling (Bird’s-eye)
+
+```
+flowchart LR
+  Flags[(Feature Flags)] -->|toggles| Web
+  Web --> Events[Client Events]
+  Events -->|batch/POST| API
+  API --> Firehose[Kinesis Firehose]
+  Firehose --> S3Analytics[(S3 Analytics)]
+  S3Analytics --> BI[QuickSight/PostHog]
+
+  Schedules[User Schedules] --> API
+  API --> EB[EventBridge Rule per User]
+  EB --> Round[Roundup Generator]
+  Round --> DDBR[(Roundups)]
+  Round --> Notify[Email/In‑app Notice]
+```
+
 ---
 
 ## 3) Data Model (DynamoDB + OpenSearch)
