@@ -41,7 +41,7 @@ AI News Commentator - An AI-driven platform that curates news from RSS feeds and
 
 ## Development Commands
 - Install: `npm install`
-- Dev server: `npm run dev`
+- Dev server: `npm run dev` (starts backend on port 3001, frontend on port 3000)
 - Build: `npm run build`
 - Test: `npm run test`
 - Test (watch): `npm run test:watch`
@@ -49,6 +49,7 @@ AI News Commentator - An AI-driven platform that curates news from RSS feeds and
 - Type check: `npm run type-check`
 - Database migrate: `npm run db:migrate`
 - Database seed: `npm run db:seed`
+- Clean builds: `npm run clean`
 
 ## Project Structure
 - `/backend` - Express.js API server
