@@ -95,6 +95,28 @@ AI News Commentator - An AI-driven platform that curates news from RSS feeds and
 - All features must be tested with Vitest
 - Focus on defensive security practices only
 
+## Git Workflow
+**Auto-commit Policy**: After completing any file changes, automatically commit and push changes unless explicitly told otherwise.
+
+**Commit Process**:
+1. Run `git status` and `git diff` to review changes
+2. Check recent `git log` to follow existing commit message style
+3. Stage relevant files with `git add`
+4. Create descriptive commit with format: `<type>: <description>`
+5. Push to remote with `git push`
+
+**Commit Message Types**: 
+- `feat:` new features
+- `update:` enhancements to existing features  
+- `fix:` bug fixes
+- `docs:` documentation changes
+- `refactor:` code restructuring
+- `test:` test additions/updates
+
+**Example**: `docs: update CLAUDE.md with implementation plan details`
+
+**Important**: Always validate code with lint/typecheck before committing. Only commit working, tested code.
+
 ## Data Model (Key Tables)
 **DynamoDB Tables**:
 - `Users` - user profiles and preferences
