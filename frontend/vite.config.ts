@@ -12,7 +12,6 @@ export default defineConfig({
     }),
     tsconfigPaths(),
   ],
-  // @ts-expect-error - Vitest config
   test: {
     globals: true,
     environment: "jsdom",

@@ -79,23 +79,40 @@ AI News Commentator - An AI-driven platform that curates news from RSS feeds and
 - Use format: `MAC-123: description` (derive Jira issue from branch name)
 - Branch naming: `type/personid-linearid-description` (e.g., `feature/macs-MAC-121-ticket-prd`)
 
-**Development Process**:
-1. **Make Changes**: Implement features, write tests, update docs
-2. **Validate Code**: ALWAYS run validation before committing:
-   - `npm run lint` - Check code style and catch basic issues
-   - `npm run type-check` - Verify TypeScript compilation
-   - Fix any errors before proceeding
-3. **Review Changes**: `git status` and `git diff` to review all modifications
-4. **Stage Files**: `git add <files>` (stage only relevant files)
-5. **Commit Changes**: `git commit -m "<type>: <description>"`
-   - Derive issue number from branch name
-   - Keep messages concise and professional
+**Development Process - MANDATORY STEPS**:
 
-**IMPORTANT**: Never commit code without running validation steps. This ensures:
-- Code quality and consistency
-- TypeScript type safety
-- Early error detection
-- Clean CI pipeline runs
+**For EVERY development task, Claude MUST follow this complete process:**
+
+1. **Make Changes**: Implement features, write tests, update docs
+2. **Validate Code**: ALWAYS run ALL validation steps before committing:
+   - `npm run build` - Ensure code compiles successfully
+   - `npm run lint` - Check code style and catch basic issues  
+   - `npm run type-check` - Verify TypeScript compilation
+   - `npm run test` - Run all tests to ensure nothing breaks
+   - **Fix any errors before proceeding - NEVER commit failing code**
+3. **Review Changes**: 
+   - `git status` - See all modified files
+   - `git diff` - Review all modifications line by line
+4. **Stage Files**: `git add <files>` (stage only relevant files, avoid staging unrelated changes)
+5. **Commit Changes**: `git commit -m "<type>: <description>"`
+   - Derive issue number from branch name if applicable
+   - Keep messages concise and professional
+   - **Example**: `test: add basic test files and fix missing dependencies`
+
+**CRITICAL**: Claude must ALWAYS commit changes after completing development tasks. This ensures:
+- Progress is tracked and preserved
+- Code quality validation is enforced
+- TypeScript type safety is verified  
+- All tests pass before changes are saved
+- Clean development workflow is maintained
+
+**When to Commit**:
+- After fixing bugs or errors
+- After adding new features or functionality  
+- After creating or updating tests
+- After refactoring or improving code
+- After updating documentation or configuration
+- **ANY time you make meaningful changes to the codebase**
 
 **Commit Message Types**: 
 - `feat:` for new features
