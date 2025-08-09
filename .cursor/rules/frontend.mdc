@@ -1,0 +1,17 @@
+---
+description: Frontend standards (Remix/React components, UX, testing)
+globs:
+  - frontend/**/*
+alwaysApply: false
+---
+
+- Framework: Remix + React + TypeScript.
+- Styling: Tailwind CSS.
+- Components: Named exports; props interfaces at top; avoid inline styles for reusable components.
+- Accessibility: Semantic headings, focus outlines, ARIA labels; keyboard shortcuts `j/k/e/s/d`.
+- State: Favor loader/actions and hooks; keep components pure; avoid implicit globals.
+- Testing: Vitest + React Testing Library; test critical flows.
+- Constraints: LinkedIn post length limits enforced in UI; show counters.
+- UX: Editor with version history; toasts for generation/publish progress.
+
+Routes to maintain: `/feed`, `/drafts`, `/settings`, `/roundups`, `/admin`.

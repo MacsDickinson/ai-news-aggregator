@@ -1,0 +1,17 @@
+---
+description: Implement a task by orchestrating via Linear MCP using the linear-issue guide (Agent Requested)
+globs:
+alwaysApply: false
+---
+
+Use Linear MCP to manage issues and status:
+1) Fetch issue: “Get Linear issue APP-123” or search within team.
+2) Summarize acceptance criteria and dependencies.
+3) Create a feature branch: `feat/APP-123-kebab-summary`.
+4) Implement with tests and docs.
+5) Run validations: build, lint, type-check, test.
+6) Update Linear status/comments; open PR and include key in title.
+
+References:
+@.claude/commands/linear-issue.md
+@docs/milestone-1-implementation-plan.md

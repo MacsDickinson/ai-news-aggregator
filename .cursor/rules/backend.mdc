@@ -1,0 +1,18 @@
+---
+description: Backend standards (Lambda/Express, validation, testing, errors, performance)
+globs:
+  - backend/**/*
+alwaysApply: false
+---
+
+- Language: TypeScript strict. Target Node per CI/LTS.
+- Framework: Express for local dev; AWS Lambda handlers for deployment.
+- Validation: Use zod for request/response schemas. Export types from schemas.
+- Testing: Vitest (unit + integration); mock external APIs; assert contracts.
+- Errors: Central error middleware; do not leak internals; structured logs.
+- Observability: Add request IDs; log latency; surface non-2xx to error tracker.
+- Performance: Use idempotency keys for publish/elaborate; backoff/retry (max 3) for outbound calls.
+- Security: Read tokens from Secrets Manager; never log secrets.
+- Data: Keep Items in DynamoDB; search/ranking in OpenSearch; cache raw metadata in S3.
+
+Prefer simple, flat modules; avoid deep nesting. Keep handlers thin and delegate to services.
