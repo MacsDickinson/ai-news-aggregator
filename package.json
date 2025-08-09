@@ -25,12 +25,12 @@
     "db:seed": "npm run db:seed --workspace=backend"
   },
   "devDependencies": {
+    "@types/node": "^20.10.5",
     "concurrently": "^8.2.2",
-    "typescript": "^5.3.3",
-    "@types/node": "^20.10.5"
+    "typescript": "^5.3.3"
   },
   "engines": {
-    "node": ">=18.0.0",
+    "node": ">=24.0.0",
     "npm": ">=9.0.0"
   },
   "author": "MacsDickinson",
