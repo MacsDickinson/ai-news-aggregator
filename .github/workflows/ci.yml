@@ -32,14 +32,14 @@ jobs:
     - name: Run linting
       run: npm run lint
     
+    - name: Build all packages
+      run: npm run build
+    
     - name: Run type checking
       run: npm run type-check
     
     - name: Run tests
       run: npm run test
-    
-    - name: Build all packages
-      run: npm run build
       
   security:
     name: Security Audit
