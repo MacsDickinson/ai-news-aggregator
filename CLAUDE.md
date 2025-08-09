@@ -80,19 +80,22 @@ AI News Commentator - An AI-driven platform that curates news from RSS feeds and
 - Branch naming: `type/personid-linearid-description` (e.g., `feature/macs-MAC-121-ticket-prd`)
 
 **Development Process**:
-1. **Create Feature Branch**: `git checkout -b type/personid-linearid-description`
-   - Example: `git checkout -b feature/macs-MAC-121-update-claude-docs`
-2. **Make Changes**: Implement features, write tests, update docs
-3. **Validate Code**: Run `npm run lint` and `npm run type-check`
-4. **Review Changes**: `git status` and `git diff` to review all modifications
-5. **Stage Files**: `git add <files>` (stage only relevant files)
-6. **Commit Changes**: `git commit -m "MAC-123: description"`
+1. **Make Changes**: Implement features, write tests, update docs
+2. **Validate Code**: ALWAYS run validation before committing:
+   - `npm run lint` - Check code style and catch basic issues
+   - `npm run type-check` - Verify TypeScript compilation
+   - Fix any errors before proceeding
+3. **Review Changes**: `git status` and `git diff` to review all modifications
+4. **Stage Files**: `git add <files>` (stage only relevant files)
+5. **Commit Changes**: `git commit -m "<type>: <description>"`
    - Derive issue number from branch name
    - Keep messages concise and professional
-7. **Push Branch**: `git push -u origin <branch-name>`
-8. **Create Pull Request**: Use GitHub CLI or web interface
-   - Include summary of changes and test plan
-   - Wait for review before merging
+
+**IMPORTANT**: Never commit code without running validation steps. This ensures:
+- Code quality and consistency
+- TypeScript type safety
+- Early error detection
+- Clean CI pipeline runs
 
 **Commit Message Types**: 
 - `feat:` for new features
