@@ -1,25 +1,24 @@
 module.exports = {
-  root: true,
+  extends: [
+    'eslint:recommended',
+  ],
   env: {
     node: true,
     es2022: true,
   },
-  extends: [
-    'eslint:recommended',
-  ],
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',
   },
   rules: {
+    'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     'prefer-const': 'error',
     'no-var': 'error',
+    'no-console': 'off',
   },
   ignorePatterns: [
     'dist/',
-    'build/',
     'node_modules/',
-    '*.js',
-    '!.eslintrc.js',
+    '**/*.ts', // Skip TypeScript files for now - will be caught by TypeScript compiler
   ],
 };

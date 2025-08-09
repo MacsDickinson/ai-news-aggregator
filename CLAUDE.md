@@ -95,12 +95,11 @@ AI News Commentator - An AI-driven platform that curates news from RSS feeds and
    - Wait for review before merging
 
 **Commit Message Types**: 
-- `MAC-123: add new feature` (new functionality)
-- `MAC-124: update existing component` (enhancements)
-- `MAC-125: fix bug in validation` (bug fixes)
-- `MAC-126: update documentation` (docs changes)
-- `MAC-127: refactor data layer` (code restructuring)
-- `MAC-128: add unit tests` (test additions)
+- `feat:` for new features
+- `fix:` for bug fixes
+- `test:` for test additions
+- `chore:` for infrastructure tasks
+- `refactor:` for code improvements
 
 **PR Creation Process**:
 1. Review all changes in branch vs main: `git diff main...HEAD`
@@ -131,7 +130,7 @@ AI News Commentator - An AI-driven platform that curates news from RSS feeds and
 
 ## LLM Integration & Prompts
 **Provider Strategy**:
-- Primary: OpenAI GPT-4-mini (cost/latency optimized)
+- Primary: OpenAI GPT-5 (cost/latency optimized)
 - Fallback: Anthropic Haiku
 - Hard guardrails: Force citations, no claims without source anchors
 
