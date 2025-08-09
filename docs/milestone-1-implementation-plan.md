@@ -688,28 +688,33 @@ This milestone groups work by functional feature areas, prioritised for delivery
 
 ## 15) Task Backlog (prioritised)
 
-**P0**
+The following backlog is grouped by priority. Each item has a checkbox for tracking completion.
 
-- Auth (Cognito) + session middleware
-- Preferences UI + API
-- Source presets seed + management
-- Fetcher Lambdas + SQS + OpenSearch indexing
-- ItemCard UI + actions + persisted state
-- Elaboration Lambda + citation validator
-- Q&A UI + storage
-- Draft generator Lambda + templates
-- Editor with version history (client‑side JSON patches)
-- LinkedIn/Substack OAuth + publish
-- Saved items + Roundup generator
-- Scheduler (EventBridge) + notifications
-- Analytics pipeline + admin dashboard
+### P0
 
-**P1**
+- [x] Initial Repository Setup and Framework Foundation — see [#1](https://github.com/MacsDickinson/ai-news-aggregator/issues/1)
+- [ ] Source presets seed + management
 
-- Low‑trust warnings with domain reputation list
-- Related coverage/duplicate merge UI
-- Import RSS OPML
-- Template manager UI
+### P1
+
+- [ ] Auth (Cognito) + session middleware
+- [ ] Fetcher Lambdas + SQS + OpenSearch indexing
+- [ ] ItemCard UI + actions + persisted state
+- [ ] Elaboration Lambda + citation validator
+- [ ] Q&A UI + storage
+- [ ] Draft generator Lambda + templates
+- [ ] Editor with version history (client‑side JSON patches)
+- [ ] LinkedIn/Substack OAuth + publish
+
+### P2
+
+- [ ] Scheduler (EventBridge) + notifications
+- [ ] Saved items + Roundup generator
+- [ ] Analytics pipeline + admin dashboard
+- [ ] Low‑trust warnings with domain reputation list
+- [ ] Related coverage/duplicate merge UI
+- [ ] Import RSS OPML
+- [ ] Template manager UI
 
 ---
 
@@ -771,5 +776,5 @@ This milestone groups work by functional feature areas, prioritised for delivery
 
 ---
 
-**This plan is build‑ready.** Next action: create infra skeleton (repo, IaC, auth), seed sources, and ship Week 1 deliverables.
+**This plan is build‑ready.** Next actions: execute the P0 backlog items, then proceed through P1 and P2.
 
