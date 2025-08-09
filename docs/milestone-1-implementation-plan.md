@@ -658,36 +658,31 @@ Sources: [Title 1]([url1]), [Title 2]([url2]), ...
 
 ---
 
-## 14) Milestones & DoD (4 Weeks)
+## 14) Milestones – Functional Features (Milestone 1)
 
-**Week 1 – Ingestion & Feed**
+This milestone groups work by functional feature areas, prioritised for delivery.
 
-- ✅ Source presets + user prefs CRUD
-- ✅ Fetcher + dedupe + trust badge
-- ✅ Feed UI + actions + filters
-- **DoD:** See a relevant feed within 2 minutes using presets; actions persist
+### P0 Functional Features
 
-**Week 2 – Elaboration, Q&A, Citations**
+- Auth & Preferences: Cognito auth, session middleware, preferences UI/API.
+- Source Presets & Management: seed presets, CRUD sources, user blocklist/trust badges.
+- Ingestion & Indexing: fetcher Lambdas, dedupe, OpenSearch indexing.
+- Feed UX: ItemCard UI, actions (interesting/dismiss/save), filters, persisted state.
+- Elaboration with Citations: Lambda generation, citation validator, latency targets.
+- Q&A Capture: modal with 3–5 prompts, persisted per item.
+- Draft Generation & Templates: LinkedIn/Substack templates wired to generator.
+- Editor & Versioning: editor with version history, copy/export.
+- Publishing Integrations: OAuth and happy-path publish to LinkedIn/Substack.
+- Saved Items & Roundups: saved bucket, manual roundup generator.
+- Scheduler & Notifications: recurring schedules and notifications.
+- Analytics v0: events pipeline and basic admin dashboard.
 
-- ✅ One‑click elaborate (summary/takeaways/why) with citations
-- ✅ Q&A modal (3–5 prompts) persisted per item
-- ✅ Validator enforcing citations
-- **DoD:** Elaborate ≤ 8s p95; JSON contract stable; Q&A saved & visible in item
+### P1 Enhancements
 
-**Week 3 – Drafting & Publishing & Roundups (base)**
-
-- ✅ Draft generator (LinkedIn/Substack) using Q&A + style presets
-- ✅ Editor + version history; copy‑export
-- ✅ OAuth + publish to LinkedIn/Substack (happy path)
-- ✅ Saved items bucket; manual roundup generator
-- **DoD:** First post published E2E from feed; roundup draft generated from 3+ saved items
-
-**Week 4 – Scheduler, Analytics, Polish**
-
-- ✅ Simple recurring schedules + notifications
-- ✅ Analytics v0 (events flowing to S3/QuickSight or PostHog)
-- ✅ Error states, accessibility pass, feature flags, token refresh
-- **DoD:** Weekly roundup auto-draft lands on schedule; admin sees metrics
+- Low‑trust warnings using domain reputation list.
+- Related coverage/duplicate merge UI.
+- Import RSS OPML.
+- Template manager UI.
 
 ---
 
