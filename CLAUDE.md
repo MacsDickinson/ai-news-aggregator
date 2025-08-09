@@ -41,7 +41,7 @@ AI News Commentator - An AI-driven platform that curates news from RSS feeds and
 
 ## Development Commands
 - Install: `npm install`
-- Dev server: `npm run dev`
+- Dev server: `npm run dev` (starts backend on port 3001, frontend on port 3000)
 - Build: `npm run build`
 - Test: `npm run test`
 - Test (watch): `npm run test:watch`
@@ -49,6 +49,7 @@ AI News Commentator - An AI-driven platform that curates news from RSS feeds and
 - Type check: `npm run type-check`
 - Database migrate: `npm run db:migrate`
 - Database seed: `npm run db:seed`
+- Clean builds: `npm run clean`
 
 ## Project Structure
 - `/backend` - Express.js API server
@@ -58,33 +59,8 @@ AI News Commentator - An AI-driven platform that curates news from RSS feeds and
 - `/tests` - Test files
 - `/database` - Database migrations and seeds
 
-## Current Milestone: Milestone 1 MVP (4-Week Timeline)
+## Current Milestone: Milestone 1
 **Goal**: End-to-end AI news curation with personalized drafting and publishing
-
-**Week 1 - Ingestion & Feed**:
-- ✅ Source presets + user preferences CRUD
-- ✅ Fetcher + dedupe + trust badge
-- ✅ Feed UI + actions + filters
-- **DoD**: See relevant feed within 2 minutes using presets; actions persist
-
-**Week 2 - Elaboration, Q&A, Citations**:
-- ✅ One-click elaborate (summary/takeaways/why) with citations
-- ✅ Q&A modal (3-5 prompts) persisted per item
-- ✅ Validator enforcing citations
-- **DoD**: Elaborate ≤ 8s p95; JSON contract stable; Q&A saved & visible
-
-**Week 3 - Drafting & Publishing & Roundups**:
-- ✅ Draft generator (LinkedIn/Substack) using Q&A + style presets
-- ✅ Editor + version history; copy-export
-- ✅ OAuth + publish to LinkedIn/Substack
-- ✅ Saved items bucket; manual roundup generator
-- **DoD**: First post published E2E from feed; roundup draft from 3+ saved items
-
-**Week 4 - Scheduler, Analytics, Polish**:
-- ✅ Simple recurring schedules + notifications
-- ✅ Analytics v0 (events flowing to S3/QuickSight)
-- ✅ Error states, accessibility pass, feature flags, token refresh
-- **DoD**: Weekly roundup auto-draft on schedule; admin sees metrics
 
 ## Coding Guidelines
 - Write TypeScript with strict mode enabled
@@ -95,27 +71,68 @@ AI News Commentator - An AI-driven platform that curates news from RSS feeds and
 - All features must be tested with Vitest
 - Focus on defensive security practices only
 
-## Git Workflow
-**Auto-commit Policy**: After completing any file changes, automatically commit and push changes unless explicitly told otherwise.
+## Git Commit Rules
+- **NEVER commit to main** unless explicitly told to (and then seek double confirmation)
+- **NEVER add watermarks, signatures, or AI-generated footers to commit messages**
+- **NO "Generated with Claude Code" or "Co-Authored-By: Claude" lines**
+- Keep commit messages clean and professional
+- Use format: `MAC-123: description` (derive Jira issue from branch name)
+- Branch naming: `type/personid-linearid-description` (e.g., `feature/macs-MAC-121-ticket-prd`)
 
-**Commit Process**:
-1. Run `git status` and `git diff` to review changes
-2. Check recent `git log` to follow existing commit message style
-3. Stage relevant files with `git add`
-4. Create descriptive commit with format: `<type>: <description>`
-5. Push to remote with `git push`
+**Development Process - MANDATORY STEPS**:
+
+**For EVERY development task, Claude MUST follow this complete process:**
+
+1. **Make Changes**: Implement features, write tests, update docs
+2. **Validate Code**: ALWAYS run ALL validation steps before committing:
+   - `npm run build` - Ensure code compiles successfully
+   - `npm run lint` - Check code style and catch basic issues  
+   - `npm run type-check` - Verify TypeScript compilation
+   - `npm run test` - Run all tests to ensure nothing breaks
+   - **Fix any errors before proceeding - NEVER commit failing code**
+3. **Review Changes**: 
+   - `git status` - See all modified files
+   - `git diff` - Review all modifications line by line
+4. **Stage Files**: `git add <files>` (stage only relevant files, avoid staging unrelated changes)
+5. **Commit Changes**: `git commit -m "<type>: <description>"`
+   - Derive issue number from branch name if applicable
+   - Keep messages concise and professional
+   - **Example**: `test: add basic test files and fix missing dependencies`
+
+**CRITICAL**: Claude must ALWAYS commit changes after completing development tasks. This ensures:
+- Progress is tracked and preserved
+- Code quality validation is enforced
+- TypeScript type safety is verified  
+- All tests pass before changes are saved
+- Clean development workflow is maintained
+
+**When to Commit**:
+- After fixing bugs or errors
+- After adding new features or functionality  
+- After creating or updating tests
+- After refactoring or improving code
+- After updating documentation or configuration
+- **ANY time you make meaningful changes to the codebase**
 
 **Commit Message Types**: 
-- `feat:` new features
-- `update:` enhancements to existing features  
-- `fix:` bug fixes
-- `docs:` documentation changes
-- `refactor:` code restructuring
-- `test:` test additions/updates
+- `feat:` for new features
+- `fix:` for bug fixes
+- `test:` for test additions
+- `chore:` for infrastructure tasks
+- `refactor:` for code improvements
 
-**Example**: `docs: update CLAUDE.md with implementation plan details`
+**PR Creation Process**:
+1. Review all changes in branch vs main: `git diff main...HEAD`
+2. Run full test suite: `npm run test`
+3. Create PR with descriptive title and body
+4. Include "Test plan" section with validation steps
+5. Tag reviewers if needed
 
-**Important**: Always validate code with lint/typecheck before committing. Only commit working, tested code.
+**Important**: 
+- Always validate code with lint/typecheck before committing
+- Only commit working, tested code
+- Never commit directly to main
+- All changes must go through PR process
 
 ## Data Model (Key Tables)
 **DynamoDB Tables**:
@@ -133,7 +150,7 @@ AI News Commentator - An AI-driven platform that curates news from RSS feeds and
 
 ## LLM Integration & Prompts
 **Provider Strategy**:
-- Primary: OpenAI GPT-4-mini (cost/latency optimized)
+- Primary: OpenAI GPT-5 (cost/latency optimized)
 - Fallback: Anthropic Haiku
 - Hard guardrails: Force citations, no claims without source anchors
 

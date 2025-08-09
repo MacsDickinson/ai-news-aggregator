@@ -1,0 +1,38 @@
+{
+  "name": "ai-news-aggregator",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-driven platform that curates news from RSS feeds and APIs, provides AI-powered elaborations with strict attribution",
+  "workspaces": [
+    "backend",
+    "frontend",
+    "shared"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "npm run dev --workspace=backend",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "build": "npm run build:shared && npm run build:backend && npm run build:frontend",
+    "build:shared": "npm run build --workspace=shared",
+    "build:backend": "npm run build --workspace=backend",
+    "build:frontend": "npm run build --workspace=frontend",
+    "test": "npm run test --workspace=backend && npm run test --workspace=frontend && npm run test --workspace=shared",
+    "test:watch": "npm run test:watch --workspace=backend",
+    "lint": "npm run lint --workspace=backend && npm run lint --workspace=frontend && npm run lint --workspace=shared",
+    "type-check": "npm run type-check --workspace=backend && npm run type-check --workspace=frontend && npm run type-check --workspace=shared",
+    "clean": "npm run clean --workspace=backend && npm run clean --workspace=frontend && npm run clean --workspace=shared",
+    "db:migrate": "npm run db:migrate --workspace=backend",
+    "db:seed": "npm run db:seed --workspace=backend"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "concurrently": "^8.2.2",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=24.0.0",
+    "npm": ">=9.0.0"
+  },
+  "author": "MacsDickinson",
+  "license": "MIT"
+}
