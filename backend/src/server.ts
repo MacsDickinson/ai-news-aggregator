@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import { EnvSchema } from '@ai-news-aggregator/shared';
+import { createLogger } from '@ai-news-aggregator/shared';
 
 // Import routes
 import feedRoutes from './routes/feed';
@@ -27,6 +28,7 @@ dotenv.config();
 const env = EnvSchema.parse(process.env);
 
 const app = express();
+const logger = createLogger('backend');
 const PORT = env.PORT;
 
 // Security middleware
@@ -79,9 +81,9 @@ app.use(errorHandler);
 // Start server
 if (require.main === module) {
   app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
-    console.log(`📖 Environment: ${env.NODE_ENV}`);
-    console.log(`📊 Health check: http://localhost:${PORT}/health`);
+    logger.info(`Server running on http://localhost:${PORT}`);
+    logger.info(`Environment: ${env.NODE_ENV}`);
+    logger.info(`Health check: http://localhost:${PORT}/health`);
   });
 }
 

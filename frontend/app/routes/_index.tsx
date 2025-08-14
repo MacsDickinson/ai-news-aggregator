@@ -1,4 +1,5 @@
 import type { MetaFunction } from "@remix-run/node";
+import { createLogger } from "@shared/utils/logger";
 
 export const meta: MetaFunction = () => {
   return [
@@ -8,6 +9,8 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Index() {
+  const logger = createLogger('frontend');
+  logger.debug('Rendering index route');
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="container mx-auto px-4 py-16">

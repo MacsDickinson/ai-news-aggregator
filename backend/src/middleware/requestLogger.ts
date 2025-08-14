@@ -1,4 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
+import { createLogger } from '@ai-news-aggregator/shared';
+
+const logger = createLogger('backend');
 
 export function requestLogger(req: Request, res: Response, next: NextFunction): void {
   const start = Date.now();
@@ -17,15 +20,12 @@ export function requestLogger(req: Request, res: Response, next: NextFunction): 
     };
 
     // Use structured logging in production
-    if (process.env.NODE_ENV === 'production') {
-      console.log(JSON.stringify(logData));
-    } else {
-      const colorCode = res.statusCode >= 400 ? '\x1b[31m' : '\x1b[32m';
-      const resetCode = '\x1b[0m';
-      console.log(
-        `${colorCode}${req.method} ${req.originalUrl} ${res.statusCode}${resetCode} - ${duration}ms`
-      );
-    }
+    // Unified logging format
+    const level = res.statusCode >= 500 ? 'ERROR' : res.statusCode >= 400 ? 'WARN' : 'INFO';
+    const message = `${req.method} ${req.originalUrl} ${res.statusCode} - ${duration}ms`;
+    if (level === 'ERROR') logger.error(message, logData);
+    else if (level === 'WARN') logger.warn(message, logData);
+    else logger.info(message, logData);
   });
 
   next();
