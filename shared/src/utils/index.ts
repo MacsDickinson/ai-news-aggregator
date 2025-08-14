@@ -1,17 +1,42 @@
-import crypto from 'crypto';
+export * from './logger';
 
 /**
- * Generate a UUID v4
+ * Generate a UUID v4 using Web Crypto API (browser-compatible)
  */
 export function generateUUID(): string {
-  return crypto.randomUUID();
+  // Browser-compatible UUID generation
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  // Fallback for older browsers
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
 }
 
 /**
- * Generate a simple hash for deduplication
+ * Generate a simple hash for deduplication using Web Crypto API
  */
-export function generateSimpleHash(input: string): string {
-  return crypto.createHash('sha256').update(input).digest('hex');
+export async function generateSimpleHash(input: string): Promise<string> {
+  // Use Web Crypto API for browser compatibility
+  if (typeof crypto !== 'undefined' && crypto.subtle) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(input);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+  
+  // Fallback simple hash for environments without Web Crypto
+  let hash = 0;
+  for (let i = 0; i < input.length; i++) {
+    const char = input.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash).toString(16);
 }
 
 /**
@@ -189,8 +214,21 @@ export function isValidUrl(url: string): boolean {
 }
 
 /**
- * Generate idempotency key
+ * Generate idempotency key using Web Crypto API
  */
 export function generateIdempotencyKey(): string {
-  return crypto.randomBytes(16).toString('hex');
+  // Use Web Crypto API for browser compatibility
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    const array = new Uint8Array(16);
+    crypto.getRandomValues(array);
+    return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+  }
+  
+  // Fallback using Math.random
+  const chars = '0123456789abcdef';
+  let result = '';
+  for (let i = 0; i < 32; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
 }
