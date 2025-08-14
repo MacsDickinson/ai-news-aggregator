@@ -1,5 +1,5 @@
 ---
-description: Implement a task by orchestrating via Linear MCP using the linear-issue guide (Agent Requested)
+description: Implement a task by orchestrating via Github MCP using the gh-issue guide (Agent Requested)
 globs:
 alwaysApply: false
 ---

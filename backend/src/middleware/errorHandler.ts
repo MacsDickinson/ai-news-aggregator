@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
+import { createLogger } from '@ai-news-aggregator/shared';
 
 export interface AppError extends Error {
   statusCode?: number;
@@ -72,6 +73,7 @@ export function errorHandler(
   res: Response,
   _next: NextFunction
 ): void {
+  const logger = createLogger('backend');
   // Handle Zod validation errors
   if (error instanceof ZodError) {
     const validationErrors = error.errors.map(err => ({
@@ -98,7 +100,7 @@ export function errorHandler(
   }
 
   // Handle programming errors
-  console.error('Unhandled error:', {
+  logger.error('Unhandled error', {
     name: error.name,
     message: error.message,
     stack: error.stack,

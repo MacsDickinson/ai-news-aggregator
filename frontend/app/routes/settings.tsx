@@ -1,4 +1,5 @@
 import type { MetaFunction } from "@remix-run/node";
+import { createLogger } from "@shared/utils/logger";
 
 export const meta: MetaFunction = () => {
   return [
@@ -7,6 +8,8 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Settings() {
+  const logger = createLogger('frontend');
+  logger.debug('Rendering settings route');
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow">

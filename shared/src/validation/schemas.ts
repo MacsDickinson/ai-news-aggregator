@@ -189,7 +189,7 @@ export const APIErrorSchema = z.object({
 // Environment schemas
 export const EnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  PORT: z.string().regex(/^\d+$/).transform(Number).default('3000'),
+  PORT: z.string().regex(/^\d+$/).transform(Number).default('3001'),
   OPENAI_API_KEY: z.string(),
   ANTHROPIC_API_KEY: z.string().optional(),
   AWS_REGION: z.string().default('us-east-1'),

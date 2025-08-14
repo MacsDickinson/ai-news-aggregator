@@ -7,6 +7,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import { createLogger } from "@ai-news-aggregator/shared";
 import "./styles/tailwind.css";
 
 export const links: LinksFunction = () => [
@@ -23,6 +24,8 @@ export const links: LinksFunction = () => [
 ];
 
 export default function App() {
+  const logger = createLogger('frontend');
+  logger.info('App mounted');
   return (
     <html lang="en" className="h-full">
       <head>
