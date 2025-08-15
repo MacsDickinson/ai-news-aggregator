@@ -65,5 +65,8 @@
     "npm": ">=9.0.0"
   },
   "author": "MacsDickinson",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "express-rate-limit": "^8.0.1"
+  }
 }
