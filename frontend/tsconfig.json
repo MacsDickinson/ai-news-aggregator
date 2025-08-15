@@ -1,9 +1,5 @@
 {
-  "include": [
-    "remix.env.d.ts",
-    "**/*.ts",
-    "**/*.tsx"
-  ],
+  "include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx"],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES6"],
     "isolatedModules": true,
@@ -19,7 +15,13 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./app/*"],
-      "@shared/*": ["../shared/src/*"]
+      "@shared/*": ["../shared/src/*"],
+      "@components/*": ["./app/components/*"],
+      "@hooks/*": ["./app/hooks/*"],
+      "@services/*": ["./app/services/*"],
+      "@utils/*": ["./app/utils/*"],
+      "@config/*": ["./app/config/*"],
+      "@styles/*": ["./app/styles/*"]
     },
     "noEmit": true,
     "noImplicitAny": true,

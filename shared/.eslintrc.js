@@ -18,6 +18,6 @@ module.exports = {
   ignorePatterns: [
     'dist/',
     'node_modules/',
-    '**/*.ts', // Skip TypeScript files for now - will be caught by TypeScript compiler
+    '**/*.ts', // TypeScript files handled by tsc
   ],
 };

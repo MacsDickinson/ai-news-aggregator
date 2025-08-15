@@ -1,0 +1,43 @@
+# Build outputs
+dist/
+build/
+coverage/
+
+# Dependencies
+node_modules/
+
+# Generated files
+*.generated.*
+.next/
+.cache/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfplan
+
+# Docker
+.dockerignore
+
+# Misc
+.env
+.env.local
+.env.*.local
+*.tgz
+*.tar.gz
+pnpm-lock.yaml
+yarn.lock
+package-lock.json

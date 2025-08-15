@@ -1,0 +1,160 @@
+# Docker Compose for AI News Aggregator Development Environment
+version: "3.8"
+
+services:
+  # LocalStack - Local AWS cloud stack
+  localstack:
+    container_name: ai-news-localstack
+    image: localstack/localstack:3.0
+    ports:
+      - "4566:4566" # LocalStack Gateway
+      - "4510-4559:4510-4559" # External services port range
+    environment:
+      # Core configuration
+      DEBUG: ${DEBUG:-0}
+      SERVICES: s3,dynamodb,opensearch,lambda,apigateway,iam,secretsmanager,eventbridge,sts
+      DATA_DIR: /tmp/localstack/data
+
+      # Feature flags
+      LAMBDA_EXECUTOR: docker
+      DOCKER_HOST: unix:///var/run/docker.sock
+
+      # Persistence
+      PERSISTENCE: 1
+
+      # OpenSearch configuration
+      OPENSEARCH_MULTI_CLUSTER: 0
+      OPENSEARCH_ENDPOINT_STRATEGY: domain
+
+      # S3 configuration
+      S3_SKIP_SIGNATURE_VALIDATION: 1
+
+      # DynamoDB configuration
+      DYNAMODB_ERROR_PROBABILITY: 0
+
+      # Port configuration
+      EDGE_PORT: 4566
+
+      # Development helpers
+      DEVELOP: 1
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    volumes:
+      - "${LOCALSTACK_VOLUME_DIR:-./infrastructure/localstack}:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - ai-news-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # Redis - For caching (optional, can be used for session storage)
+  redis:
+    container_name: ai-news-redis
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - ai-news-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # PostgreSQL - Alternative database for development (optional)
+  postgres:
+    container_name: ai-news-postgres
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ai_news_aggregator
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/postgresql/init:/docker-entrypoint-initdb.d
+    networks:
+      - ai-news-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Elasticsearch (alternative to OpenSearch for local development)
+  elasticsearch:
+    container_name: ai-news-elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - ai-news-network
+    healthcheck:
+      test:
+        ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    profiles:
+      - elasticsearch
+
+  # Kibana (for Elasticsearch visualization)
+  kibana:
+    container_name: ai-news-kibana
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - ai-news-network
+    profiles:
+      - elasticsearch
+
+  # Nginx (for local development reverse proxy)
+  nginx:
+    container_name: ai-news-nginx
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./infrastructure/nginx/conf.d:/etc/nginx/conf.d:ro
+    depends_on:
+      - localstack
+    networks:
+      - ai-news-network
+    profiles:
+      - nginx
+
+# Networks
+networks:
+  ai-news-network:
+    driver: bridge
+    name: ai-news-network
+
+# Volumes
+volumes:
+  redis_data:
+    name: ai-news-redis-data
+  postgres_data:
+    name: ai-news-postgres-data
+  elasticsearch_data:
+    name: ai-news-elasticsearch-data
