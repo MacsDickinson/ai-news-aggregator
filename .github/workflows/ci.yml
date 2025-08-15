@@ -110,19 +110,15 @@ jobs:
 
       - name: Terraform Format Check
         run: terraform fmt -check -recursive
-        working-directory: ./infrastructure/terraform
 
       - name: Terraform Init
         run: terraform init
-        working-directory: ./infrastructure/terraform
 
       - name: Terraform Validate
         run: terraform validate
-        working-directory: ./infrastructure/terraform
 
       - name: Terraform Plan (Development)
         run: terraform plan -var-file=environments/development.tfvars -no-color
-        working-directory: ./infrastructure/terraform
 
   # Job 4: Integration Tests with LocalStack
   integration:

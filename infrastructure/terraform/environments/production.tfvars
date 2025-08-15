@@ -8,6 +8,6 @@ aws_region  = "us-east-1"
 use_localstack = false
 
 # Production-specific settings
-dynamodb_table_prefix          = "ai-news-aggregator-prod"
-enable_point_in_time_recovery  = true
-enable_deletion_protection     = true
+dynamodb_table_prefix         = "ai-news-aggregator-prod"
+enable_point_in_time_recovery = true
+enable_deletion_protection    = true

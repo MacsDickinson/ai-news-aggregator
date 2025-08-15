@@ -19,14 +19,14 @@ provider "aws" {
   dynamic "endpoints" {
     for_each = var.use_localstack ? [1] : []
     content {
-      s3                = var.localstack_endpoint
-      dynamodb          = var.localstack_endpoint
-      opensearch        = var.localstack_endpoint
-      lambda            = var.localstack_endpoint
-      apigateway        = var.localstack_endpoint
-      iam               = var.localstack_endpoint
-      secretsmanager    = var.localstack_endpoint
-      eventbridge       = var.localstack_endpoint
+      s3             = var.localstack_endpoint
+      dynamodb       = var.localstack_endpoint
+      opensearch     = var.localstack_endpoint
+      lambda         = var.localstack_endpoint
+      apigateway     = var.localstack_endpoint
+      iam            = var.localstack_endpoint
+      secretsmanager = var.localstack_endpoint
+      eventbridge    = var.localstack_endpoint
     }
   }
 
@@ -47,10 +47,10 @@ data "aws_caller_identity" "current" {}
 locals {
   environment = var.environment
   app_name    = var.app_name
-  
+
   # Resource naming convention
   name_prefix = "${local.app_name}-${local.environment}"
-  
+
   # Common tags
   common_tags = {
     Environment = local.environment

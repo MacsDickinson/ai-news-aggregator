@@ -3,9 +3,9 @@
 # S3 Bucket for cache and assets
 resource "aws_s3_bucket" "cache" {
   bucket = "${local.name_prefix}-cache"
-  
+
   tags = merge(local.common_tags, {
-    Name = "${local.name_prefix}-cache"
+    Name    = "${local.name_prefix}-cache"
     Purpose = "Cache and static assets"
   })
 }

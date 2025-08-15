@@ -9,6 +9,6 @@ use_localstack      = true
 localstack_endpoint = "http://localhost:4566"
 
 # Development-specific settings
-dynamodb_table_prefix          = "ai-news-aggregator-dev"
-enable_point_in_time_recovery  = false
-enable_deletion_protection     = false
+dynamodb_table_prefix         = "ai-news-aggregator-dev"
+enable_point_in_time_recovery = false
+enable_deletion_protection    = false
