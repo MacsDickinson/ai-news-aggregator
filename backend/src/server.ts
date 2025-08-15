@@ -1,8 +1,17 @@
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import { env } from "@config/env";
 import { createLogger } from "@ai-news-aggregator/shared";
+
+// Set up rate limiter: max 100 requests per 15 minutes per IP
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
 
 // Import routes
 import feedRoutes from "./routes/feed";
@@ -43,6 +52,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Request logging
 app.use(requestLogger);
+
+// API rate limiting
+app.use("/api/", apiLimiter);
 
 // Health check routes
 app.use("/health", healthRoutes);
