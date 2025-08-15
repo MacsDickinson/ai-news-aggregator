@@ -17,7 +17,7 @@
     "db:seed": "tsx src/scripts/seed.ts"
   },
   "dependencies": {
-    "@ai-news-aggregator/shared": "../shared",
+    "@ai-news-aggregator/shared": "file:../shared",
     "@anthropic-ai/sdk": "^0.9.1",
     "@aws-sdk/client-dynamodb": "^3.460.0",
     "@aws-sdk/client-eventbridge": "^3.460.0",
