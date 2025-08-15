@@ -2,66 +2,164 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
-    branches: [main]
+    branches: [main, develop]
+
+env:
+  NODE_VERSION: "20"
 
 jobs:
+  # Job 1: Test and Build
   test:
     name: Test and Build
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    
+
     strategy:
       matrix:
-        node-version: [20.x, 24.x]
-    
+        workspace: [backend, frontend, shared]
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-    
-    - name: Setup Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    
-    - name: Install dependencies
-      run: npm ci
-    
-    - name: Run linting
-      run: npm run lint
-    
-    - name: Build all packages
-      run: npm run build
-    
-    - name: Run type checking
-      run: npm run type-check
-    
-    - name: Run tests
-      run: npm run test
-      
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting for ${{ matrix.workspace }}
+        run: npm run lint --workspace=${{ matrix.workspace }}
+
+      - name: Run type checking for ${{ matrix.workspace }}
+        run: npm run type-check --workspace=${{ matrix.workspace }}
+
+      - name: Build ${{ matrix.workspace }}
+        run: npm run build --workspace=${{ matrix.workspace }}
+
+      - name: Run tests for ${{ matrix.workspace }}
+        run: npm run test --workspace=${{ matrix.workspace }}
+        env:
+          NODE_ENV: test
+
+  # Job 2: Security Audit
   security:
     name: Security Audit
     runs-on: ubuntu-latest
-    timeout-minutes: 5
-    
+    timeout-minutes: 10
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20.x
-        cache: 'npm'
-    
-    - name: Install dependencies
-      run: npm ci
-    
-    - name: Run security audit
-      run: npm audit --audit-level high
-      
-    - name: Check for known vulnerabilities
-      run: npx audit-ci --config ./audit-ci.json
-      continue-on-error: true
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run security audit
+        run: npm audit --audit-level high
+
+      - name: Check for known vulnerabilities
+        run: npx audit-ci --config ./audit-ci.json
+        continue-on-error: true
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
+  # Job 3: Infrastructure Validation
+  infrastructure:
+    name: Infrastructure Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+        working-directory: ./infrastructure/terraform
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ./infrastructure/terraform
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: ./infrastructure/terraform
+
+      - name: Terraform Plan (Development)
+        run: terraform plan -var-file=environments/development.tfvars -no-color
+        working-directory: ./infrastructure/terraform
+
+  # Job 4: Integration Tests with LocalStack
+  integration:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      localstack:
+        image: localstack/localstack:3.0
+        ports:
+          - 4566:4566
+        env:
+          SERVICES: s3,dynamodb,opensearch,lambda,apigateway,iam,secretsmanager
+          DEBUG: 1
+          DATA_DIR: /tmp/localstack/data
+          LAMBDA_EXECUTOR: docker
+        options: >-
+          --health-cmd "curl -f http://localhost:4566/_localstack/health"
+          --health-interval 30s
+          --health-timeout 10s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Wait for LocalStack
+        run: |
+          echo "Waiting for LocalStack to be ready..."
+          timeout 60 bash -c 'until curl -f http://localhost:4566/_localstack/health; do sleep 2; done'
+
+      - name: Build all packages
+        run: npm run build
+
+      - name: Run integration tests
+        run: npm run test
+        env:
+          USE_LOCALSTACK: true
+          LOCALSTACK_ENDPOINT: http://localhost:4566
+          AWS_ACCESS_KEY_ID: test
+          AWS_SECRET_ACCESS_KEY: test
+          AWS_REGION: us-east-1

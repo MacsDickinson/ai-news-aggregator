@@ -1,0 +1,10 @@
+# Run lint-staged for incremental linting of staged files
+npx lint-staged
+
+# Run type checking on all projects
+echo "🔍 Running type checks..."
+npm run type-check
+
+# Run tests
+echo "🧪 Running tests..."
+npm run test

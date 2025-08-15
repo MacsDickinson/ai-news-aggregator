@@ -22,11 +22,42 @@
     "type-check": "npm run type-check --workspace=backend && npm run type-check --workspace=frontend && npm run type-check --workspace=shared",
     "clean": "npm run clean --workspace=backend && npm run clean --workspace=frontend && npm run clean --workspace=shared",
     "db:migrate": "npm run db:migrate --workspace=backend",
-    "db:seed": "npm run db:seed --workspace=backend"
+    "db:seed": "npm run db:seed --workspace=backend",
+    "docker:up": "./scripts/docker-dev.sh up",
+    "docker:down": "./scripts/docker-dev.sh down",
+    "docker:logs": "./scripts/docker-dev.sh logs",
+    "docker:clean": "./scripts/docker-dev.sh clean",
+    "localstack:init": "./scripts/init-localstack.sh",
+    "infra:init": "./infrastructure/scripts/terraform-init.sh",
+    "infra:plan": "./infrastructure/scripts/terraform-plan.sh",
+    "infra:apply": "./infrastructure/scripts/terraform-apply.sh",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "validate": "npm run type-check && npm run lint && npm run test",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "backend/**/*.ts": [
+      "prettier --write"
+    ],
+    "frontend/**/*.{ts,tsx}": [
+      "prettier --write"
+    ],
+    "shared/**/*.ts": [
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
   },
   "devDependencies": {
     "@types/node": "^20.10.5",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
     "concurrently": "^8.2.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.5",
+    "prettier": "^3.6.2",
     "typescript": "^5.3.3"
   },
   "engines": {

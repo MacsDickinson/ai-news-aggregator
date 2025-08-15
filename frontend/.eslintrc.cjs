@@ -1,6 +1,8 @@
 module.exports = {
   extends: [
     'eslint:recommended',
+    '@remix-run/eslint-config',
+    '@remix-run/eslint-config/node',
   ],
   env: {
     browser: true,
@@ -10,6 +12,9 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',
+    ecmaFeatures: {
+      jsx: true,
+    },
   },
   rules: {
     'prefer-const': 'error',
@@ -20,7 +25,7 @@ module.exports = {
     'build/',
     'public/build/',
     'node_modules/',
-    '**/*.ts', // Skip TypeScript files for now - will be caught by TypeScript compiler
+    '**/*.ts', // TypeScript files handled by tsc
     '**/*.tsx',
   ],
 };

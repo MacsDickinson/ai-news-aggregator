@@ -1,0 +1,27 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./backend" },
+    { "path": "./frontend" },
+    { "path": "./shared" }
+  ],
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "exactOptionalPropertyTypes": true,
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["./shared/src/*"],
+      "@backend/*": ["./backend/src/*"],
+      "@frontend/*": ["./frontend/app/*"]
+    }
+  }
+}
