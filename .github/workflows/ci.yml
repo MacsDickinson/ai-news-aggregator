@@ -166,3 +166,53 @@ jobs:
           AWS_ACCESS_KEY_ID: test
           AWS_SECRET_ACCESS_KEY: test
           AWS_REGION: us-east-1
+
+  # Job 5: Code Coverage
+  coverage:
+    name: Code Coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      matrix:
+        workspace: [backend, frontend, shared]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build shared workspace (dependency for coverage)
+        run: npm run build --workspace=shared
+
+      - name: Run coverage for ${{ matrix.workspace }}
+        run: npm run test:coverage --workspace=${{ matrix.workspace }}
+
+      - name: Coveralls GitHub Action
+        uses: coverallsapp/github-action@v2.3.6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          flag-name: ${{ matrix.workspace }}
+          parallel: true
+          base-path: ${{ matrix.workspace }}
+          file: ${{ matrix.workspace }}/coverage/lcov.info
+
+  # Finish coverage reporting
+  coverage-finish:
+    name: Finish Coverage Reporting
+    needs: coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@v2.3.6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          parallel-finished: true

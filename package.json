@@ -18,6 +18,7 @@
     "build:frontend": "npm run build --workspace=frontend",
     "test": "npm run test --workspace=backend && npm run test --workspace=frontend && npm run test --workspace=shared",
     "test:watch": "npm run test:watch --workspace=backend",
+    "test:coverage": "npm run test:coverage --workspace=backend && npm run test:coverage --workspace=frontend && npm run test:coverage --workspace=shared",
     "lint": "npm run lint --workspace=backend && npm run lint --workspace=frontend && npm run lint --workspace=shared",
     "type-check": "npm run type-check --workspace=backend && npm run type-check --workspace=frontend && npm run type-check --workspace=shared",
     "clean": "npm run clean --workspace=backend && npm run clean --workspace=frontend && npm run clean --workspace=shared",
