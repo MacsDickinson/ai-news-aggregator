@@ -162,3 +162,23 @@ coverage/
 /build
 /public/build
 .remix
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfplan.*
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# Keep environment-specific tfvars but ignore sensitive ones
+*.tfvars
+!environments/*.tfvars
+!terraform.tfvars.example
